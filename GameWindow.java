@@ -3,6 +3,8 @@ package com.cathc_the_drope;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 public class GameWindow extends JFrame {
@@ -29,6 +31,22 @@ public class GameWindow extends JFrame {
         game_window.setResizable(false); //запрещаем изменение размера окна
         last_frame_time = System.nanoTime(); //фиксированное время в предыдущем кадре
         GameField game_field = new GameField(); //создаем объект класса GameField
+        game_field.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int x = e.getX(); //определяем координаты
+                int y = e.getY();
+                float drop_right = drop_left + drop.getWidth(null); //параметра капли
+                float drop_bottom = drop_top + drop.getHeight(null);
+                boolean is_drop = x >= drop_left && x <= drop_right && y <=drop_bottom && y >= drop_top;
+                if (is_drop){
+                    drop_top = -100;
+                    drop_left = (int)(Math.random() * (game_field.getWidth() - drop.getWidth(null)));
+                    drop_v = drop_v + 20;
+                }
+
+            }
+        });
         game_window.add(game_field); //добавляем объект в окно
         game_window.setVisible(true); //делаем окно видимым
 
@@ -43,7 +61,7 @@ public class GameWindow extends JFrame {
         //отрисовываем фон, точку и надпись
         g.drawImage(background, 0, 0, null);
         g.drawImage(drop, (int) drop_left, (int) drop_top, null);
-      //  g.drawImage(game_over,280,120, null);
+        if(drop_top > game_window.getHeight()) g.drawImage(game_over,280,120, null);
     }
 
     private static class GameField extends JPanel{
